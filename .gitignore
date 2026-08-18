@@ -18,11 +18,12 @@ mlflow.db
 .DS_Store
 Thumbs.db
 
-# Data (large files)
-data/*.csv
-
-# Models (large files)
+# Models (generated artifacts)
 models/*.joblib
 
 # Codegraph
 .codegraph/
+
+# Test/temp data
+data/X_test.csv
+data/y_test.csv
