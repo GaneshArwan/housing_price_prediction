@@ -105,7 +105,7 @@ def generate_report():
     
     # --- Title Block (First Frame) ---
     story.append(Paragraph("Ames Housing Price Prediction using Machine Learning", style_title))
-    story.append(Paragraph("Autonomous ECC Research Agent<br/>Department of Computer Science, AI Systems", style_author))
+    story.append(Paragraph("Ganesh Arwan<br/>Project Owner & ML Engineer", style_author))
     
     abstract_text = ("<b><i>Abstract</i>—This paper presents an end-to-end machine learning pipeline designed to "
                      "predict housing prices using the Ames Housing Dataset. We employ feature engineering, "
