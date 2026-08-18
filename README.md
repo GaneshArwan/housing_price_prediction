@@ -21,17 +21,55 @@ We take a **data-driven approach** to understand which features a homeowner coul
 
 ---
 
-## 🏗️ Directory Breakdown
+## 🏗️ Project Structure
 
-| Directory/File | Description |
+```
+housing_price_prediction/
+├── .github/
+│   └── workflows/
+│       └── ml_pipeline.yml        # CI/CD pipeline (GitHub Actions)
+├── data/
+│   └── ames_housing.csv           # Ames Housing Dataset (2,930 rows)
+├── models/
+│   ├── linear_regression.joblib   # Serialized LR model
+│   └── random_forest.joblib       # Serialized RF model
+├── notebooks/
+│   └── analysis.ipynb             # Exploratory data analysis
+├── reports/
+│   └── figures/
+│       ├── feature_importance.png
+│       ├── residual_plot.png
+│       └── Housing_Price_Prediction_Report.pdf
+├── src/
+│   ├── config.py                  # Pydantic configuration & validation
+│   ├── data_loader.py             # Data ingestion & preprocessing
+│   ├── evaluate.py                # Metrics & visualization generation
+│   ├── format_utils.py            # i18n currency formatting (Babel)
+│   ├── generate_pdf_report.py     # Platypus PDF report generator
+│   ├── guardrails.py              # Prediction value validation
+│   └── train.py                   # Model training with MLflow tracking
+├── tests/
+│   ├── test_data_loader.py        # QA/QC: data pipeline tests
+│   └── test_train.py              # QA/QC: config validation tests
+├── .gitignore
+├── LICENSE                        # MIT License
+├── README.md
+└── requirements.txt
+```
+
+### 📁 Directory Breakdown
+
+| Directory / File | Description |
 | :--- | :--- |
-| `src/` | Source code for the ML pipeline (`data_loader.py`, `train.py`, `evaluate.py`, `config.py`) |
-| `data/` | Raw and processed datasets (ignored by git, automatically downloaded) |
+| `.github/workflows/` | CI/CD pipeline — runs security scans, tests, and model training on every push |
+| `src/` | Core ML pipeline: data loading, training, evaluation, PDF reporting, and guardrails |
+| `data/` | Raw dataset committed to the repo for reproducible builds |
+| `models/` | Serialized trained models (`.joblib`, git-ignored) |
 | `notebooks/` | Jupyter notebooks for exploratory data analysis and visual insights |
-| `reports/figures/` | Generated plots (feature importance, correlation heatmaps, residuals) |
+| `reports/figures/` | Generated plots and the Platypus PDF report |
+| `tests/` | Pytest test suite for QA/QC (data validation + config schema tests) |
 | `requirements.txt` | Python dependencies required to run the pipeline |
-| `venv/` | Isolated Python virtual environment (ignored by git) |
-| `LICENSE` | Open-source MIT [License](LICENSE) |
+| `LICENSE` | Open-source [MIT License](LICENSE) |
 
 ---
 
