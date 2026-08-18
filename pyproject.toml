@@ -1,0 +1,9 @@
+[project]
+name = "housing-price-prediction"
+version = "1.0.0"
+description = "End-to-end ML pipeline for Ames Housing price prediction"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

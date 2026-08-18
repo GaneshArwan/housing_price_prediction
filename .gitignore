@@ -24,6 +24,10 @@ models/*.joblib
 # Codegraph
 .codegraph/
 
+# Tool metadata
+docs/maestro/
+
 # Test/temp data
 data/X_test.csv
 data/y_test.csv
+test_dl.csv

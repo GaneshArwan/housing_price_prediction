@@ -27,7 +27,7 @@ def generate_report():
     
     # Feature Importance
     story.append(Paragraph("1. Feature Importance", heading_style))
-    feature_imp_path = os.path.join(config.paths.reports_dir, "figures", "feature_importance.png")
+    feature_imp_path = os.path.join(config.paths.reports_dir, "feature_importance.png")
     if os.path.exists(feature_imp_path):
         story.append(Image(feature_imp_path, width=400, height=300))
     else:
@@ -36,7 +36,7 @@ def generate_report():
     
     # Residual Plot
     story.append(Paragraph("2. Residual Plot", heading_style))
-    res_path = os.path.join(config.paths.reports_dir, "figures", "residual_plot.png")
+    res_path = os.path.join(config.paths.reports_dir, "residual_plot.png")
     if os.path.exists(res_path):
         story.append(Image(res_path, width=400, height=240))
     else:
@@ -45,7 +45,7 @@ def generate_report():
     
     # Heatmap
     story.append(Paragraph("3. Correlation Heatmap", heading_style))
-    heat_path = os.path.join(config.paths.reports_dir, "figures", "correlation_heatmap.png")
+    heat_path = os.path.join(config.paths.reports_dir, "correlation_heatmap.png")
     if os.path.exists(heat_path):
         story.append(Image(heat_path, width=400, height=320))
     else:

@@ -7,16 +7,18 @@ on:
     branches: [ "main" ]
 
 jobs:
-  qa_qc_and_train:
+  qa_qc:
+    name: QA/QC (Lint + Test)
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Set up Python 3.11
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
+        cache: 'pip'
         
     - name: Install dependencies
       run: |
@@ -24,18 +26,57 @@ jobs:
         pip install -r requirements.txt
         pip install bandit
         
-    - name: Security Scan (QA/QC)
+    - name: Security Scan (Bandit)
       run: |
-        bandit -r src/
+        bandit -r src/ --severity-level medium
         
-    - name: Run Tests (QA/QC)
+    - name: Run Tests (Pytest)
       run: |
-        pytest tests/
+        pytest tests/ -v
       env:
         PYTHONPATH: .
-        
-    - name: Train Models (MLOps)
+
+  train:
+    name: Train Models (MLOps)
+    needs: qa_qc
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Train Models
       run: |
         python -m src.train
       env:
         PYTHONPATH: .
+
+    - name: Generate Evaluation Plots
+      run: |
+        python -m src.evaluate
+      env:
+        PYTHONPATH: .
+
+    - name: Generate PDF Report
+      run: |
+        python -m src.generate_pdf_report
+      env:
+        PYTHONPATH: .
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ml-pipeline-outputs
+        path: |
+          reports/figures/
+        retention-days: 30

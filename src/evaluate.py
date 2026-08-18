@@ -56,18 +56,26 @@ def evaluate_and_plot():
     df = fetch_ames_housing_data()
     # Select numeric columns
     numeric_df = df.select_dtypes(include=['number'])
-    # Correlation with SalePrice
+    # Handle both column name variants
+    target_col = None
     if 'SalePrice' in numeric_df.columns:
-        correlations = numeric_df.corr()['SalePrice'].sort_values(ascending=False)
-        top_corr_features = correlations.index[1:11] # Top 10 excluding SalePrice
+        target_col = 'SalePrice'
+    elif 'Sale_Price' in numeric_df.columns:
+        target_col = 'Sale_Price'
+    
+    if target_col:
+        correlations = numeric_df.corr()[target_col].sort_values(ascending=False)
+        top_corr_features = correlations.index[1:11] # Top 10 excluding target
         
         plt.figure(figsize=(10, 8))
-        top_corr_matrix = numeric_df[['SalePrice'] + list(top_corr_features)].corr()
+        top_corr_matrix = numeric_df[[target_col] + list(top_corr_features)].corr()
         sns.heatmap(top_corr_matrix, annot=True, cmap='coolwarm', fmt=".2f")
-        plt.title("Correlation Heatmap (Top Features vs SalePrice)")
+        plt.title(f"Correlation Heatmap (Top Features vs {target_col})")
         plt.tight_layout()
         plt.savefig(os.path.join(config.paths.reports_dir, "correlation_heatmap.png"))
         plt.close()
+    else:
+        print("Warning: Target column not found in dataset. Skipping heatmap.")
     
     print(f"All plots saved to {config.paths.reports_dir}/")
 
