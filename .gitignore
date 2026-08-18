@@ -1,0 +1,28 @@
+# Virtual environment
+venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# MLflow local artifacts
+mlruns/
+mlflow.db
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data (large files)
+data/*.csv
+
+# Models (large files)
+models/*.joblib
+
+# Codegraph
+.codegraph/
