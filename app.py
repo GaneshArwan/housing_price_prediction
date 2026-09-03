@@ -47,7 +47,10 @@ if page == "Predict":
     st.title("🏠 Predict Housing Price")
     st.markdown("Adjust the home features below to get an estimated sale price.")
 
-    model = load_model()
+    model_choice = st.radio("Select ML Model", ["Random Forest (Recommended)", "Linear Regression (Baseline)"], horizontal=True)
+    model_name = "random_forest" if "Random Forest" in model_choice else "linear_regression"
+    
+    model = load_model(model_name)
     raw_df = load_dataset()
     training_cols = get_training_columns()
 
@@ -167,8 +170,25 @@ elif page == "Explore Data":
     st.pyplot(fig2)
     plt.close()
 
-    st.subheader("Raw Data Sample")
-    st.dataframe(raw_df.head(50), use_container_width=True)
+    st.subheader("Filter & Export Data")
+    all_neighborhoods = sorted(raw_df["Neighborhood"].unique().tolist())
+    selected_neighborhoods = st.multiselect("Filter by Neighborhood(s)", all_neighborhoods, default=[])
+    
+    if selected_neighborhoods:
+        filtered_df = raw_df[raw_df["Neighborhood"].isin(selected_neighborhoods)]
+    else:
+        filtered_df = raw_df
+
+    st.metric("Showing Homes", f"{len(filtered_df):,}")
+    st.dataframe(filtered_df.head(100), use_container_width=True)
+    
+    st.download_button(
+        label="📥 Download Filtered Data as CSV",
+        data=filtered_df.to_csv(index=False).encode("utf-8"),
+        file_name="ames_housing_filtered.csv",
+        mime="text/csv",
+        help="Download the currently filtered dataset for offline analysis."
+    )
 
 # --- Model Performance Page ---
 elif page == "Model Performance":
