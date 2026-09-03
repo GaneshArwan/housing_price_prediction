@@ -149,8 +149,8 @@ def generate_report():
     story.append(Paragraph("III. Experimental Results", style_heading))
     story.append(Paragraph("Model performance was rigorously quantified using the Root Mean Squared Error (RMSE) metric on a held-out "
                            "test set representing 20% of the data. The baseline Linear Regression model achieved an RMSE of approximately "
-                           "<b>$29,000</b>. In contrast, the Random Forest model significantly outperformed the baseline, achieving "
-                           "an RMSE of <b>$28,400</b>.", style_body))
+                           "$29,000. In contrast, the Random Forest model significantly outperformed the baseline, achieving "
+                           "an RMSE of $28,400.", style_body))
     story.append(Paragraph("Given the dataset's median home price of $160,000, an RMSE of $28,400 represents a relative error margin "
                            "of approximately 17.7%. While acceptable for general market valuation, this highlights the inherent volatility "
                            "of real estate markets. The reduction in error from the baseline demonstrates the ensemble method's superior capacity "
