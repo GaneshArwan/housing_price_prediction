@@ -48,8 +48,6 @@ def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     # Target variable is typically Sale_Price
     if 'Sale_Price' in processed.columns:
         processed.rename(columns={'Sale_Price': 'SalePrice'}, inplace=True)
-    elif 'SalePrice' not in processed.columns:
-        raise ValueError("Target variable 'SalePrice' not found in dataset.")
         
     # Fill numeric NaNs with median
     numeric_cols = processed.select_dtypes(include=['number']).columns

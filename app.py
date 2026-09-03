@@ -124,9 +124,10 @@ if page == "Predict":
             input_df = preprocess_data(input_df)
 
             # Align columns to training set
-            for col in training_cols:
-                if col not in input_df.columns:
-                    input_df[col] = 0
+            missing_cols = [c for c in training_cols if c not in input_df.columns]
+            if missing_cols:
+                missing_df = pd.DataFrame(0, index=input_df.index, columns=missing_cols)
+                input_df = pd.concat([input_df, missing_df], axis=1)
             input_df = input_df[training_cols]
 
             prediction = model.predict(input_df)[0]
@@ -159,7 +160,8 @@ elif page == "Explore Data":
     fig2, ax2 = plt.subplots(figsize=(12, 5))
     neighborhood_median = raw_df.groupby("Neighborhood")["Sale_Price"].median().sort_values(ascending=False)
     sns.barplot(x=neighborhood_median.index, y=neighborhood_median.values, ax=ax2)
-    ax2.set_xticklabels(ax2.get_xticklabels(), rotation=45, ha="right", fontsize=7)
+    ax2.set_xticks(range(len(neighborhood_median.index)))
+    ax2.set_xticklabels(neighborhood_median.index, rotation=45, ha="right", fontsize=7)
     ax2.set_ylabel("Median Sale Price ($)")
     plt.tight_layout()
     st.pyplot(fig2)
