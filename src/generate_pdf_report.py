@@ -125,8 +125,9 @@ def generate_report():
                            "Accurate valuation models are essential for buyers, sellers, and financial institutions to minimize "
                            "risk and optimize asset management. The Ames Housing Dataset, a modernized and feature-rich alternative "
                            "to the Boston Housing Dataset, offers an extensive collection of 80 explanatory variables describing "
-                           "almost every aspect of residential homes in Ames, Iowa.", style_body))
-    story.append(Paragraph("In this study, we utilize advanced machine learning techniques to systematically analyze "
+                           "almost every aspect of 2,930 residential home sales in Ames, Iowa, between 2006 and 2010.", style_body))
+    story.append(Paragraph("Given the median home sale price in this dataset is approximately $160,000, establishing a model with "
+                           "low variance is critical. In this study, we utilize advanced machine learning techniques to systematically analyze "
                            "and predict sale prices. By integrating continuous integration, deployment, and comprehensive "
                            "model tracking via MLflow, we establish a robust, production-ready predictive pipeline capable of "
                            "handling complex non-linear feature interactions.", style_body))
@@ -141,14 +142,19 @@ def generate_report():
                            "Regressor is employed to capture non-linear relationships and complex interactions between variables, "
                            "such as the compounding value of a finished basement combined with high overall quality.", style_body))
     story.append(Paragraph("Model training, hyperparameter tuning, and artifact generation are strictly managed and "
-                           "version-controlled using MLflow, ensuring absolute reproducibility across training runs.", style_body))
+                           "version-controlled using MLflow. Specifically, the Random Forest architecture is constrained via "
+                           "maximum tree depth (<i>max_depth</i>) and the number of estimators (<i>n_estimators</i>) to prevent "
+                           "overfitting on the training distribution, ensuring absolute reproducibility across training runs.", style_body))
     
     story.append(Paragraph("III. Experimental Results", style_heading))
-    story.append(Paragraph("Model performance was quantified using the Root Mean Squared Error (RMSE) metric on a held-out "
-                           "test set (20% of the data). The baseline Linear Regression model achieved an RMSE of approximately "
+    story.append(Paragraph("Model performance was rigorously quantified using the Root Mean Squared Error (RMSE) metric on a held-out "
+                           "test set representing 20% of the data. The baseline Linear Regression model achieved an RMSE of approximately "
                            "<b>$29,000</b>. In contrast, the Random Forest model significantly outperformed the baseline, achieving "
-                           "an RMSE of <b>$28,400</b>. This reduction in error highlights the ensemble method's superior capacity "
-                           "to model real estate pricing dynamics.", style_body))
+                           "an RMSE of <b>$28,400</b>.", style_body))
+    story.append(Paragraph("Given the dataset's median home price of $160,000, an RMSE of $28,400 represents a relative error margin "
+                           "of approximately 17.7%. While acceptable for general market valuation, this highlights the inherent volatility "
+                           "of real estate markets. The reduction in error from the baseline demonstrates the ensemble method's superior capacity "
+                           "to model real estate pricing dynamics without requiring exhaustive polynomial feature engineering.", style_body))
     
     # Helper function to add images cleanly
     def add_figure(filename, caption, width=COLUMN_WIDTH):
@@ -168,9 +174,9 @@ def generate_report():
                            "followed closely by above-ground living area (<i>GrLivArea</i>). These fundamental attributes dominate "
                            "the linear pricing model and serve as primary anchors for property valuation.", style_body))
                            
-    add_figure("feature_importance.png", "Fig. 2. Top 20 feature importances derived from the Random Forest model.")
+    add_figure("feature_importance.png", "Fig. 2. Top 20 feature importances (Mean Decrease in Impurity) derived from the Random Forest model.")
     
-    story.append(Paragraph("The Random Forest feature importance (Fig. 2) corroborates the linear correlation analysis but introduces "
+    story.append(Paragraph("The Random Forest feature importance (Fig. 2), calculated via Mean Decrease in Impurity, corroborates the linear correlation analysis but introduces "
                            "nuance. While Overall Quality remains paramount, neighborhood specifications and basement attributes "
                            "(such as <i>TotalBsmtSF</i>) account for significant variance reduction in the decision trees, proving that "
                            "sub-surface structural quality heavily dictates final sale prices.", style_body))
