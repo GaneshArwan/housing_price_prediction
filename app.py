@@ -62,17 +62,17 @@ if page == "Predict":
         overall_qual = st.selectbox("Overall Quality", [
             "Very_Poor", "Poor", "Fair", "Below_Average", "Average",
             "Above_Average", "Good", "Very_Good", "Excellent", "Very_Excellent"
-        ], index=4)
+        ], index=4, help="Overall material and finish of the house")
         year_built = st.slider("Year Built", 1872, 2010, 1990)
-        year_remod = st.slider("Year Remodeled", 1950, 2010, 2000)
+        year_remod = st.slider("Year Remodeled", 1950, 2010, 2000, help="Same as construction date if no remodeling or additions")
         overall_cond = st.selectbox("Overall Condition", [
             "Very_Poor", "Poor", "Fair", "Below_Average", "Average",
             "Above_Average", "Good", "Very_Good", "Excellent", "Very_Excellent"
-        ], index=4)
+        ], index=4, help="Overall condition rating of the house")
 
     with col2:
         st.subheader("Size & Area")
-        gr_liv_area = st.slider("Above Ground Living Area (sqft)", 300, 5700, 1500)
+        gr_liv_area = st.slider("Above Ground Living Area (sqft)", 300, 5700, 1500, help="Does not include basement area")
         total_bsmt_sf = st.slider("Total Basement Area (sqft)", 0, 6200, 1000)
         lot_area = st.slider("Lot Area (sqft)", 1300, 50000, 10000)
         first_flr_sf = st.slider("First Floor Area (sqft)", 300, 4700, 1100)
@@ -81,10 +81,10 @@ if page == "Predict":
     with col3:
         st.subheader("Rooms & Features")
         full_bath = st.selectbox("Full Bathrooms", [0, 1, 2, 3, 4], index=1)
-        bedroom = st.selectbox("Bedrooms Above Ground", [0, 1, 2, 3, 4, 5, 6], index=2)
+        bedroom = st.selectbox("Bedrooms Above Ground", [0, 1, 2, 3, 4, 5, 6], index=2, help="Does not include basement bedrooms")
         garage_cars = st.selectbox("Garage Car Capacity", [0, 1, 2, 3, 4, 5], index=2)
         fireplaces = st.selectbox("Fireplaces", [0, 1, 2, 3, 4], index=0)
-        totrms = st.selectbox("Total Rooms Above Ground", list(range(2, 16)), index=4)
+        totrms = st.selectbox("Total Rooms Above Ground", list(range(2, 16)), index=4, help="Does not include bathrooms")
         neighborhood = st.selectbox("Neighborhood", sorted(raw_df["Neighborhood"].unique().tolist()))
 
     st.markdown("---")
@@ -117,18 +117,19 @@ if page == "Predict":
         input_row["TotRms_AbvGrd"] = totrms
         input_row["Neighborhood"] = neighborhood
 
-        input_df = pd.DataFrame([input_row])
+        with st.spinner("Analyzing market data and calculating estimate..."):
+            input_df = pd.DataFrame([input_row])
 
-        # Run through the same preprocessing pipeline
-        input_df = preprocess_data(input_df)
+            # Run through the same preprocessing pipeline
+            input_df = preprocess_data(input_df)
 
-        # Align columns to training set
-        for col in training_cols:
-            if col not in input_df.columns:
-                input_df[col] = 0
-        input_df = input_df[training_cols]
+            # Align columns to training set
+            for col in training_cols:
+                if col not in input_df.columns:
+                    input_df[col] = 0
+            input_df = input_df[training_cols]
 
-        prediction = model.predict(input_df)[0]
+            prediction = model.predict(input_df)[0]
 
         if PredictionGuardrail.validate_prediction(prediction):
             st.success(f"### Estimated Sale Price: ${prediction:,.0f}")
