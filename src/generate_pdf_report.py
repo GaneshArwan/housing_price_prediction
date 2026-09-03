@@ -36,7 +36,7 @@ def generate_report():
 
     # Frame Design
     # First Page: Title Frame (top), Left Col (bottom), Right Col (bottom)
-    TITLE_HEIGHT = 180
+    TITLE_HEIGHT = 150
     frame_title = Frame(MARGIN_LEFT, PAGE_HEIGHT - MARGIN_TOP - TITLE_HEIGHT, 
                         CONTENT_WIDTH, TITLE_HEIGHT, id='title', showBoundary=0)
     
@@ -105,7 +105,7 @@ def generate_report():
     
     # --- Title Block (First Frame) ---
     story.append(Paragraph("Ames Housing Price Prediction using Machine Learning", style_title))
-    story.append(Paragraph("William<br/>Project Owner & ML Engineer", style_author))
+    story.append(Paragraph("William<br/>wiliamzwili135@gmail.com", style_author))
     
     abstract_text = ("<b><i>Abstract</i>—This paper presents an end-to-end machine learning pipeline designed to "
                      "predict housing prices using the Ames Housing Dataset. We employ feature engineering, "
@@ -174,6 +174,13 @@ def generate_report():
                            "The established MLOps pipeline ensures reproducibility and continuous quality control. "
                            "Future work will explore gradient boosting architectures and localized geographic clustering.", style_body))
                            
+    story.append(Paragraph("V. References", style_heading))
+    story.append(Paragraph("[1] D. De Cock, \"Ames, Iowa: Alternative to the Boston Housing Data as an "
+                           "End of Semester Regression Project,\" Journal of Statistics Education, vol. 19, no. 3, 2011.", style_body))
+    story.append(Paragraph("[2] L. Breiman, \"Random Forests,\" Machine Learning, vol. 45, pp. 5-32, 2001.", style_body))
+    story.append(Paragraph("[3] M. Zaharia et al., \"Accelerating the Machine Learning Lifecycle with MLflow,\" "
+                           "IEEE Data Eng. Bull., vol. 41, no. 4, pp. 39-45, 2018.", style_body))
+
     doc.build(story)
     print(f"IEEE formatted PDF report successfully generated at {report_path}")
 
