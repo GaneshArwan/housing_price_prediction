@@ -36,7 +36,7 @@ def generate_report():
 
     # Frame Design
     # First Page: Title Frame (top), Left Col (bottom), Right Col (bottom)
-    TITLE_HEIGHT = 150
+    TITLE_HEIGHT = 215
     frame_title = Frame(MARGIN_LEFT, PAGE_HEIGHT - MARGIN_TOP - TITLE_HEIGHT, 
                         CONTENT_WIDTH, TITLE_HEIGHT, id='title', showBoundary=0)
     
