@@ -36,7 +36,7 @@ def generate_report():
 
     # Frame Design
     # First Page: Title Frame (top), Left Col (bottom), Right Col (bottom)
-    TITLE_HEIGHT = 250
+    TITLE_HEIGHT = 215
     frame_title = Frame(MARGIN_LEFT, PAGE_HEIGHT - MARGIN_TOP - TITLE_HEIGHT, 
                         CONTENT_WIDTH, TITLE_HEIGHT, id='title', showBoundary=0)
     
@@ -106,10 +106,6 @@ def generate_report():
     # --- Title Block (First Frame) ---
     story.append(Paragraph("Ames Housing Price Prediction using Machine Learning", style_title))
     story.append(Paragraph("William<br/>wiliamzwili135@gmail.com", style_author))
-    
-    # ECC Deep Research Persona Required Metadata
-    meta_text = "<i>Generated: September 2026 | Sources: Ames Housing Dataset | Confidence: 95% (High)</i>"
-    story.append(Paragraph(meta_text, ParagraphStyle('Meta', parent=styles['Normal'], alignment=TA_CENTER, spaceAfter=18)))
     
     abstract_text = ("<b><i>Abstract</i>—This paper presents an end-to-end machine learning pipeline designed to "
                      "predict housing prices using the Ames Housing Dataset. We employ feature engineering, "
