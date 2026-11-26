@@ -32,7 +32,7 @@ def fetch_ames_housing_data():
         
     return pd.read_csv(data_path)
 
-def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
+def preprocess_data(df: pd.DataFrame, drop_first: bool = True) -> pd.DataFrame:
     """
     Preprocess the Ames Housing dataset for modeling.
     - Handles missing values
@@ -58,7 +58,7 @@ def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     processed[cat_cols] = processed[cat_cols].fillna('Unknown')
     
     # One-hot encode categorical variables
-    processed = pd.get_dummies(processed, columns=cat_cols, drop_first=True)
+    processed = pd.get_dummies(processed, columns=cat_cols, drop_first=drop_first)
     
     return processed
 

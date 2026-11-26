@@ -1,3 +1,4 @@
+import math
 from pydantic import BaseModel, Field
 
 class PredictionGuardrail(BaseModel):
@@ -9,12 +10,15 @@ class PredictionGuardrail(BaseModel):
     @classmethod
     def validate_prediction(cls, price: float) -> bool:
         try:
+            if not math.isfinite(price):
+                print(f"Guardrail validation failed: non-finite price {price}")
+                return False
             cls(predicted_price=price)
             # Add arbitrary business logic guardrails
             if price > 10000000 or price < 1000:
                 print(f"Warning: Price {price} failed extreme value guardrails.")
                 return False
             return True
-        except ValueError as e:
+        except (TypeError, ValueError) as e:
             print(f"Guardrail validation failed: {e}")
             return False

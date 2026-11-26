@@ -28,7 +28,7 @@ jobs:
         
     - name: Security Scan (Bandit)
       run: |
-        bandit -r src/ --severity-level medium
+        bandit -r src/ app.py --severity-level medium
         
     - name: Run Tests (Pytest)
       run: |

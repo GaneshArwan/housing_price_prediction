@@ -7,8 +7,20 @@ __pycache__/
 venv/
 .venv/
 
+# Git & CI
+.git/
+.github/
+.env*
+
 # MLflow tracking
 mlruns/
+mlflow.db
+
+# Tests & coverage
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
 
 # IDE
 .idea/

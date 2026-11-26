@@ -14,9 +14,14 @@ st.set_page_config(
     layout="wide",
 )
 
+ALLOWED_MODELS = {"random_forest", "linear_regression"}
+
+
 # --- Load model and data ---
 @st.cache_resource
 def load_model(name="random_forest"):
+    if name not in ALLOWED_MODELS:
+        raise ValueError(f"Invalid model '{name}'. Choose from: {sorted(ALLOWED_MODELS)}")
     path = os.path.join(config.paths.model_dir, f"{name}.joblib")
     if not os.path.exists(path):
         return None
@@ -123,15 +128,9 @@ if page == "Predict":
         with st.spinner("Analyzing market data and calculating estimate..."):
             input_df = pd.DataFrame([input_row])
 
-            # Run through the same preprocessing pipeline
-            input_df = preprocess_data(input_df)
-
-            # Align columns to training set
-            missing_cols = [c for c in training_cols if c not in input_df.columns]
-            if missing_cols:
-                missing_df = pd.DataFrame(0, index=input_df.index, columns=missing_cols)
-                input_df = pd.concat([input_df, missing_df], axis=1)
-            input_df = input_df[training_cols]
+            # Preserve single-row categorical levels before aligning to training columns
+            input_df = preprocess_data(input_df, drop_first=False)
+            input_df = input_df.reindex(columns=training_cols, fill_value=0)
 
             prediction = model.predict(input_df)[0]
 

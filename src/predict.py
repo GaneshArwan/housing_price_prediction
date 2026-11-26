@@ -2,13 +2,18 @@ import os
 import joblib
 import pandas as pd
 from src.config import config
-from src.data_loader import preprocess_data
 from src.guardrails import PredictionGuardrail
-from src.format_utils import format_rmse
+
+
+ALLOWED_MODELS = {"random_forest", "linear_regression"}
 
 
 def load_model(model_name: str = "random_forest"):
     """Load a trained model from disk."""
+    if model_name not in ALLOWED_MODELS:
+        raise ValueError(
+            f"Invalid model '{model_name}'. Allowed models: {sorted(ALLOWED_MODELS)}"
+        )
     model_path = os.path.join(config.paths.model_dir, f"{model_name}.joblib")
     if not os.path.exists(model_path):
         raise FileNotFoundError(

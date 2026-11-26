@@ -31,3 +31,5 @@ docs/maestro/
 data/X_test.csv
 data/y_test.csv
 test_dl.csv
+.coverage
+htmlcov/
