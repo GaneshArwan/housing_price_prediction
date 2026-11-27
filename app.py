@@ -4,6 +4,9 @@ import joblib
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
 from src.config import config
 from src.data_loader import fetch_ames_housing_data, preprocess_data
 from src.guardrails import PredictionGuardrail
@@ -18,6 +21,37 @@ ALLOWED_MODELS = {"random_forest", "linear_regression"}
 
 
 # --- Load model and data ---
+@st.cache_resource
+def ensure_models():
+    """Train and save baseline models on first boot when artifacts are absent (e.g., Streamlit Cloud)."""
+    rf_path = os.path.join(config.paths.model_dir, "random_forest.joblib")
+    lr_path = os.path.join(config.paths.model_dir, "linear_regression.joblib")
+    x_test_path = os.path.join(config.paths.data_dir, "X_test.csv")
+    if os.path.exists(rf_path) and os.path.exists(lr_path) and os.path.exists(x_test_path):
+        return True
+
+    df = fetch_ames_housing_data()
+    processed = preprocess_data(df)
+    X = processed.drop(columns=["SalePrice"])
+    y = processed["SalePrice"]
+    X_train, X_test, y_train, _ = train_test_split(
+        X, y, test_size=config.model.test_size, random_state=config.model.random_state
+    )
+
+    lr = LinearRegression().fit(X_train, y_train)
+    rf = RandomForestRegressor(
+        n_estimators=config.model.rf_n_estimators,
+        max_depth=config.model.rf_max_depth,
+        random_state=config.model.random_state,
+    ).fit(X_train, y_train)
+
+    config.create_dirs()
+    joblib.dump(lr, lr_path)
+    joblib.dump(rf, rf_path)
+    X_test.to_csv(x_test_path, index=False)
+    return True
+
+
 @st.cache_resource
 def load_model(name="random_forest"):
     if name not in ALLOWED_MODELS:
@@ -54,7 +88,8 @@ if page == "Predict":
 
     model_choice = st.radio("Select ML Model", ["Random Forest (Recommended)", "Linear Regression (Baseline)"], horizontal=True)
     model_name = "random_forest" if "Random Forest" in model_choice else "linear_regression"
-    
+
+    ensure_models()
     model = load_model(model_name)
     raw_df = load_dataset()
     training_cols = get_training_columns()

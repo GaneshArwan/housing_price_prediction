@@ -1,82 +1,52 @@
-name: MLOps Pipeline
+name: QA & Security Check
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "main" ]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "app.py"
+      - "requirements.txt"
+      - ".github/workflows/ml_pipeline.yml"
   pull_request:
     branches: [ "main" ]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "app.py"
+      - "requirements.txt"
+      - ".github/workflows/ml_pipeline.yml"
+
+permissions:
+  contents: read
 
 jobs:
   qa_qc:
-    name: QA/QC (Lint + Test)
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-        cache: 'pip'
-        
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install bandit
-        
-    - name: Security Scan (Bandit)
-      run: |
-        bandit -r src/ app.py --severity-level medium
-        
-    - name: Run Tests (Pytest)
-      run: |
-        pytest tests/ -v
-      env:
-        PYTHONPATH: .
-
-  train:
-    name: Train Models (MLOps)
-    needs: qa_qc
+    name: Bandit + Pytest
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-        cache: 'pip'
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt bandit
 
-    - name: Train Models
-      run: |
-        python -m src.train
-      env:
-        PYTHONPATH: .
+      - name: Security Scan (Bandit)
+        run: |
+          bandit -r src/ app.py --severity-level medium
 
-    - name: Generate Evaluation Plots
-      run: |
-        python -m src.evaluate
-      env:
-        PYTHONPATH: .
-
-    - name: Generate PDF Report
-      run: |
-        python -m src.generate_pdf_report
-      env:
-        PYTHONPATH: .
-
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ml-pipeline-outputs
-        path: |
-          reports/figures/
-        retention-days: 30
+      - name: Run Tests (Pytest)
+        run: |
+          pytest tests/ -v
+        env:
+          PYTHONPATH: .

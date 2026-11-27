@@ -1,151 +1,85 @@
-# 🏠 Housing Price Prediction (Regression)
+# Ames Housing Price Prediction
 
-![CI/CD](https://github.com/GaneshArwan/housing_price_prediction/actions/workflows/ml_pipeline.yml/badge.svg)
-![Python](https://img.shields.io/badge/Python-3.11-blue)
-![MLflow](https://img.shields.io/badge/MLflow-Tracking-orange)
-![License](https://img.shields.io/badge/License-MIT-green)
+[![QA & Security](https://github.com/GaneshArwan/housing_price_prediction/actions/workflows/ml_pipeline.yml/badge.svg)](https://github.com/GaneshArwan/housing_price_prediction/actions/workflows/ml_pipeline.yml)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/GaneshArwan/housing_price_prediction/blob/main/notebooks/analysis.ipynb)
+![Python 3.11](https://img.shields.io/badge/Python-3.11-blue)
+![License: MIT](https://img.shields.io/badge/License-MIT-green)
 
-## Problem Statement
-What features most influence home sale prices, and how accurately can prices be predicted?
+Regression pipeline predicting residential sale prices in Ames, Iowa (2006–2010), paired with MLflow tracking, Pydantic output guardrails, an interactive Streamlit app, a runnable Colab notebook, and an automated two-column IEEE PDF report.
 
 ## Dataset
-- **Source:** Ames Housing Dataset (Kaggle / De Cock, 2011) — 2,930 observations with 81 columns (80 features + `Sale_Price`). Far richer than the deprecated Boston Housing dataset.
-- **Size:** 2,930 rows × 81 columns (after preprocessing and one-hot encoding, 300 encoded features + `SalePrice`)
-- **Description:** Residential home sales in Ames, Iowa (2006–2010). Covers structural attributes (square footage, basement quality, garage capacity), neighborhood, zoning, and condition ratings. Missing values occur in `Misc_Feature` (2,824 NaNs) and `Mas_Vnr_Type` (1,775 NaNs), which are imputed as `'Unknown'` during preprocessing (zero-valued `Lot_Frontage` and `'No_Garage'` `Garage_Type` entries are pre-encoded in this mirror).
+- **Source:** Ames Housing Dataset (De Cock, 2011) — `2,930` sales across `81` columns (`80` explanatory variables plus `Sale_Price`).
+- **Target distribution:** Prices range from `$12,789` to `$755,000` (mean `$180,796`, median `$160,000`, SD `$79,887`, skewness `1.74`). Only `64` sales (`2.2%`) equal or exceed `$400,000`.
+- **Missing data:** In this mirror, `NaN` values appear in `Misc_Feature` (`2,824`) and `Mas_Vnr_Type` (`1,775`), both filled with `'Unknown'`. Zero-valued `Lot_Frontage` (`490` rows) and `'No_Garage'` `Garage_Type` (`157` rows) are already encoded in the CSV.
 
-## Skills Demonstrated
-Regression modeling, feature selection, handling missing data, residual analysis, MLOps pipeline design, CI/CD automation, Pydantic guardrails, and professional PDF reporting.
+## Pipeline Design
+1. **Preprocessing (`src/data_loader.py`):** Drops legacy identifier/sparse columns if present (`Id`, `PID`, `Alley`, `PoolQC`, `Fence`, `MiscFeature`), renames `Sale_Price` to `SalePrice`, imputes numeric `NaN`s with column medians and categorical `NaN`s with `'Unknown'`, and one-hot encodes categoricals (`drop_first=True` for training, producing `300` features without feature scaling).
+2. **Inference Parity (`app.py`, `src/predict.py`):** Single-row Streamlit inference uses `drop_first=False` and reindexes onto the `300` training columns so selected categories are retained. Model loading enforces `ALLOWED_MODELS = {"random_forest", "linear_regression"}` and `PredictionGuardrail` rejects non-finite values or prices outside `$1,000`–`$10,000,000`.
+3. **Modeling (`src/train.py`):** Trains OLS `LinearRegression` and `RandomForestRegressor` (`n_estimators=100`, `max_depth=None`, `random_state=42`) on an 80/20 split (`2,344` train / `586` test) with MLflow tracking.
 
-## Deliverables
-- Feature importance analysis with correlation heatmaps
-- Linear regression and random forest models with RMSE comparison
-- Residual plots showing model assumptions and limitations
-- Clear explanation of which features a homeowner could change to increase value
-- IEEE-formatted PDF research report generated via ReportLab Platypus
-- MLflow experiment tracking with logged parameters, metrics, and serialized models
-
-## Approach
-1. **Data Cleaning & EDA** — Identifier and sparse columns (`Id`, `PID`, `Alley`, `PoolQC`, `Fence`, `MiscFeature`) dropped if present. Numeric missing values filled with column median; categorical missing values filled with `'Unknown'`. Target column `Sale_Price` renamed to `SalePrice`.
-2. **Feature Engineering** — One-hot encoding of categorical variables (`drop_first=True` for training, `drop_first=False` with training-column reindexing for single-row Streamlit inference). Highly correlated features identified via heatmap analysis.
-3. **Modeling** — Baseline Linear Regression vs. ensemble Random Forest Regressor. Random Forest selected for its ability to capture non-linear interactions without polynomial feature engineering.
-4. **Evaluation** — RMSE on a held-out 20% test split. Feature importance via Mean Decrease in Impurity. Residual analysis for homoscedasticity verification.
-
-## Key Results
-Holdout 20% test split (`n=586`, `random_state=42`):
-
+## Holdout Results (`n=586`)
 | Metric | Linear Regression | Random Forest |
-|--------|-------------------|---------------|
-| RMSE | $29,026.76 | $28,471.76 |
-| Relative Error (vs Median $160,000) | 18.14% | 17.79% |
-| MAE | $16,478.20 | $16,641.57 |
+|---|---:|---:|
+| RMSE | \$29,026.76 | \$28,471.76 |
+| Relative RMSE (% Median \$160,000) | 18.14% | 17.79% |
+| MAE | \$16,478.20 | \$16,641.57 |
 | R² | 0.8949 | 0.8989 |
 | MAPE | 8.99% | 9.31% |
-| Standard Homes RMSE (<$400k, `n=566`) | $24,690.27 | $24,242.60 |
-| Luxury Homes RMSE (≥$400k, `n=20`) | $86,225.57 | $84,378.68 |
+| Standard Homes RMSE (<\$400k, `n=566`) | \$24,690.27 | \$24,242.60 |
+| Luxury Homes RMSE (≥\$400k, `n=20`) | \$86,225.57 | \$84,378.68 |
 
-## Key Findings
-1. **Top numeric linear predictors:** Above-ground living area (`Gr_Liv_Area`, `r=0.7068`), garage car capacity (`Garage_Cars`, `r=0.6476`), garage area (`Garage_Area`, `r=0.6401`), and basement area (`Total_Bsmt_SF`, `r=0.6325`) have the highest Pearson correlation with `Sale_Price`.
-2. **Top Random Forest MDI features:** `Garage_Cars` (29.78%), `Gr_Liv_Area` (14.95%), `Year_Built` (10.89%), `Exter_Qual_Typical` (6.75%), `First_Flr_SF` (5.38%), and `Total_Bsmt_SF` (5.36%) dominate tree impurity reduction.
-3. **Ordinal one-hot dilution & segment error:** Because `Overall_Qual` is stored as text categories and one-hot encoded into 9 sparse dummy columns, its split importance is diluted across individual dummies. Luxury homes (`≥$400k`) exhibit 3.48× higher Random Forest RMSE than standard homes (`$84,379` vs. `$24,243`) due to sparse upper-tail coverage.
+## Findings & Limitations
+1. **Numeric linear correlations:** `Gr_Liv_Area` (`r=0.7068`), `Garage_Cars` (`r=0.6476`), `Garage_Area` (`r=0.6401`), `Total_Bsmt_SF` (`r=0.6325`), and `First_Flr_SF` (`r=0.6217`) show the highest Pearson correlations with `Sale_Price`. `Garage_Cars` and `Garage_Area` are strongly collinear (`r=0.89`).
+2. **Random Forest MDI splits:** `Garage_Cars` (`29.78%`), `Gr_Liv_Area` (`14.95%`), `Year_Built` (`10.89%`), `Exter_Qual_Typical` (`6.75%`), `First_Flr_SF` (`5.38%`), and `Total_Bsmt_SF` (`5.36%`) lead tree impurity reduction.
+3. **One-hot dilution of ordinal quality:** Because `Overall_Qual` is stored as text labels and one-hot encoded into 9 dummy columns, its tree importance is split across dummies (`2.20%` combined MDI).
+4. **Upper-tail error:** Random Forest RMSE increases `3.48x` on luxury homes (`≥$400k`, `n=20`), where tree averaging underpredicts scarce upper-tail comparables. Next steps: ordinal-encode quality ratings, model `log1p(SalePrice)`, and benchmark gradient boosting with 5-fold cross-validation.
 
-## How to Run
+## Quickstart
 ```bash
-# 1. Clone and set up virtual environment
 git clone https://github.com/GaneshArwan/housing_price_prediction.git
 cd housing_price_prediction
 python -m venv venv
-venv\Scripts\activate        # Windows
-# source venv/bin/activate   # macOS/Linux
-
-# 2. Install dependencies
+venv\Scripts\activate        # Windows (macOS/Linux: source venv/bin/activate)
 pip install -r requirements.txt
 
-# 3. Train the model (with MLflow tracking)
 python -m src.train
-
-# 4. Generate evaluation plots
 python -m src.evaluate
-
-# 5. Generate IEEE PDF report
 python -m src.generate_pdf_report
-
-# 6. Run predictions with guardrails
 python -m src.predict
-
-# 7. Launch Streamlit dashboard
 streamlit run app.py
-
-# 8. Or run via Docker
-docker build -t housing-price-predictor . && docker run -p 8501:8501 housing-price-predictor
-
-# 9. Run tests
 pytest
 ```
 
-## Files
+Run in Docker:
+```bash
+docker build -t housing-price-predictor . && docker run -p 8501:8501 housing-price-predictor
+```
+
+## Project Structure
 ```
 housing_price_prediction/
-├── .github/workflows/
-│   └── ml_pipeline.yml          # CI/CD pipeline (pytest + bandit + PDF)
-├── data/
-│   └── ames_housing.csv         # Static dataset (CI-safe, no network calls)
-├── models/                      # Generated at train time (gitignored)
-│   ├── linear_regression.joblib # Serialized baseline linear model
-│   └── random_forest.joblib     # Serialized trained Random Forest model
-├── notebooks/
-│   └── analysis.ipynb           # Exploratory data analysis notebook
+├── .github/workflows/ml_pipeline.yml   # Path-filtered Bandit + Pytest CI
+├── data/ames_housing.csv               # Static Ames Housing dataset (2,930 x 81)
+├── notebooks/analysis.ipynb            # Self-contained Colab analysis notebook
 ├── reports/figures/
-│   ├── correlation_heatmap.png  # Top feature correlations
-│   ├── feature_importance.png   # Random Forest MDI importances
-│   ├── residual_plot.png        # Predicted vs actual residuals
-│   └── Housing_Price_Prediction_Report.pdf  # IEEE formatted report
+│   ├── correlation_heatmap.png
+│   ├── feature_importance.png
+│   ├── residual_plot.png
+│   └── Housing_Price_Prediction_Report.pdf
 ├── src/
-│   ├── __init__.py
-│   ├── config.py                # Pydantic-based configuration schemas
-│   ├── data_loader.py           # Data ingestion and preprocessing
-│   ├── evaluate.py              # Plot generation (heatmap, importance, residuals)
-│   ├── format_utils.py          # Locale-aware currency and RMSE formatting
-│   ├── generate_pdf_report.py   # IEEE two-column PDF via ReportLab Platypus
-│   ├── guardrails.py            # Pydantic prediction boundary validation
-│   ├── predict.py               # Model inference with guardrails
-│   └── train.py                 # Training with MLflow tracking
-├── tests/
-│   ├── __init__.py
-│   ├── test_app.py              # Streamlit UI integration tests
-│   ├── test_data_loader.py      # Data ingestion unit tests
-│   ├── test_evaluate.py         # Directory/artifact path tests
-│   ├── test_guardrails.py       # Boundary validation tests
-│   ├── test_predict.py          # Inference, allowlist, and formatter tests
-│   └── test_train.py            # Config and Pydantic validation tests
-├── .dockerignore                # Docker build context exclusions
-├── .gitignore
-├── app.py                       # Interactive Streamlit dashboard
-├── conftest.py                  # Shared pytest path setup
-├── Dockerfile                   # Container image for Streamlit app
+│   ├── config.py                       # Pydantic configuration schemas
+│   ├── data_loader.py                  # Data ingestion and preprocessing
+│   ├── evaluate.py                     # Evaluation plot generation
+│   ├── format_utils.py                 # Babel currency and RMSE formatting
+│   ├── generate_pdf_report.py          # Data-driven IEEE two-column PDF generator
+│   ├── guardrails.py                   # Pydantic + finite-number prediction guardrails
+│   ├── predict.py                      # Guardrailed model inference CLI/API
+│   └── train.py                        # Training with MLflow experiment tracking
+├── tests/                              # Unit, guardrail, report, and Streamlit UI tests
+├── app.py                              # Self-bootstrapping Streamlit dashboard
+├── conftest.py                         # Pytest sys.path setup
+├── Dockerfile                          # Non-root container image
 ├── LICENSE
-├── pyproject.toml               # Pytest and project metadata
-├── README.md
+├── pyproject.toml
 └── requirements.txt
 ```
-
-## MLOps Workflow
-
-```mermaid
-graph LR
-    A[Data Ingestion] --> B[Preprocessing]
-    B --> C[Train Models]
-    C --> D[MLflow Tracking]
-    D --> E[Evaluate & Plot]
-    E --> F[PDF Report]
-    C --> G[Serialize Model]
-    G --> H[Predict with Guardrails]
-    F --> I[CI/CD Pipeline]
-    H --> I
-```
-
-## Methodology & Limitations
-This project uses a straightforward supervised regression approach on the Ames Housing Dataset. The Random Forest Regressor was chosen as the primary model due to its robustness against overfitting and its native ability to rank feature importances via Mean Decrease in Impurity. All experiments are tracked through MLflow, ensuring full reproducibility of training runs, hyperparameters, and serialized model artifacts.
-
-The primary limitation is **luxury home pricing volatility**. For properties at or above $400,000 (`n=20` in the test split), Random Forest RMSE rises from $24,243 to $84,379 (3.48× higher) as upper-tail comparables become sparse. This is expected, as ultra-high-end homes depend on custom attributes not captured in the 80 explanatory variables.
-
-Additionally, the dataset is geographically limited to Ames, Iowa (2006–2010), which means the model should not be generalized to other housing markets without retraining. Future improvements include ordinal encoding for quality ratings, log-transforming `SalePrice`, gradient boosting methods (XGBoost/LightGBM), and a FastAPI serving layer for real-time predictions.

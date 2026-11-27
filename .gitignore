@@ -1,5 +1,12 @@
+# Environment variables & secrets
+.env
+.env.*
+
 # Virtual environment
 venv/
+
+# Internal agent rules
+.agents/
 
 # Python
 __pycache__/

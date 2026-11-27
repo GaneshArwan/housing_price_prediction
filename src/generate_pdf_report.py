@@ -279,7 +279,7 @@ def generate_report():
 
     # --- Title & Abstract ---
     story.append(Paragraph("Ames Housing Price Prediction: Empirical Evaluation and Error Analysis", style_title))
-    story.append(Paragraph("William<br/>wiliamzwili135@gmail.com", style_author))
+    story.append(Paragraph("GaneshArwan<br/>github.com/GaneshArwan/housing_price_prediction", style_author))
     abstract_text = (
         f"<b><i>Abstract</i>—This study evaluates an end-to-end regression pipeline on the Ames Housing Dataset "
         f"({m['raw_rows']:,} residential sales, {m['raw_cols']} raw columns, {m['proc_features']} encoded features). "
