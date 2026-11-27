@@ -1,11 +1,16 @@
 # Ames Housing Price Prediction
 
 [![QA & Security](https://github.com/GaneshArwan/housing_price_prediction/actions/workflows/ml_pipeline.yml/badge.svg)](https://github.com/GaneshArwan/housing_price_prediction/actions/workflows/ml_pipeline.yml)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ames-housing-price-predictor.streamlit.app/)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/GaneshArwan/housing_price_prediction/blob/main/notebooks/analysis.ipynb)
 ![Python 3.11](https://img.shields.io/badge/Python-3.11-blue)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green)
 
 Regression pipeline predicting residential sale prices in Ames, Iowa (2006–2010), paired with MLflow tracking, Pydantic output guardrails, an interactive Streamlit app, a runnable Colab notebook, and an automated two-column IEEE PDF report.
+
+- **Live App:** https://ames-housing-price-predictor.streamlit.app/
+- **Colab Notebook:** https://colab.research.google.com/github/GaneshArwan/housing_price_prediction/blob/main/notebooks/analysis.ipynb
+- **IEEE Report:** [Housing_Price_Prediction_Report.pdf](reports/figures/Housing_Price_Prediction_Report.pdf)
 
 ## Dataset
 - **Source:** Ames Housing Dataset (De Cock, 2011) — `2,930` sales across `81` columns (`80` explanatory variables plus `Sale_Price`).
